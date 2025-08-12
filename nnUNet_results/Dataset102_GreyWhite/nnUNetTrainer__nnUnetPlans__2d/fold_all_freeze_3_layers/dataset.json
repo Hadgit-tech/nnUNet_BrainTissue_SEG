@@ -1,0 +1,22 @@
+{
+    "channel_names": {
+        "1": "reg_T1",
+        "0": "FLAIR"
+    },
+    "labels": {
+        "background": 0,
+        "Cortical gray matter": 1,
+        "Basal ganglia": 2,
+        "White matter": 3,
+        "White matter lesions": 4,
+        "Cerebrospinal fluid in the extracerebral space": 5,
+        "Ventricles": 6,
+        "Cerebellum": 7,
+        "Brainstem": 8,
+        "Infarction": 9
+    },
+    "numTraining": 23,
+    "numTest": 30,
+    "file_ending": ".nii.gz",
+    "dataset_name": "Dataset102_GreyWhite"
+}

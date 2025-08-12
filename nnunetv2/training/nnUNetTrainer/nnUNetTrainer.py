@@ -11,6 +11,7 @@ from typing import Tuple, Union, List
 
 import numpy as np
 import torch
+from torch.optim.lr_scheduler import CyclicLR
 from batchgenerators.dataloading.multi_threaded_augmenter import MultiThreadedAugmenter
 from batchgenerators.dataloading.nondet_multi_threaded_augmenter import NonDetMultiThreadedAugmenter
 from batchgenerators.dataloading.single_threaded_augmenter import SingleThreadedAugmenter
@@ -142,13 +143,13 @@ class nnUNetTrainer(object):
                 if self.is_cascaded else None
 
         ### Some hyperparameters for you to fiddle with
-        self.initial_lr = 1e-2
+        self.initial_lr = 1e-1 # this is the initial learning rate. It will be adapted by the lr scheduler
         self.weight_decay = 3e-5
         self.oversample_foreground_percent = 0.33
         self.probabilistic_oversampling = False
         self.num_iterations_per_epoch = 250
         self.num_val_iterations_per_epoch = 50
-        self.num_epochs = 1000
+        self.num_epochs = 500
         self.current_epoch = 0
         self.enable_deep_supervision = True
 
@@ -214,6 +215,37 @@ class nnUNetTrainer(object):
                 self.label_manager.num_segmentation_heads,
                 self.enable_deep_supervision
             ).to(self.device)
+
+            #Remove comment for freeze encoder
+            # self.network = self.build_network_architecture(
+            #     self.configuration_manager.network_arch_class_name,
+            #     self.configuration_manager.network_arch_init_kwargs,
+            #     self.configuration_manager.network_arch_init_kwargs_req_import,
+            #     self.num_input_channels,
+            #     self.label_manager.num_segmentation_heads,
+            #     self.enable_deep_supervision
+            # )
+            # for p in self.network.encoder.parameters():
+            #     print("Freeze encoder")
+            #     p.requires_grad = False
+            # self.network.to(self.device)
+
+            #Remove comment for Freeze first K encoder stages - change K to the number of layers you want to freeze
+            # self.network = self.build_network_architecture(
+            #     self.configuration_manager.network_arch_class_name,
+            #     self.configuration_manager.network_arch_init_kwargs,
+            #     self.configuration_manager.network_arch_init_kwargs_req_import,
+            #     self.num_input_channels,
+            #     self.label_manager.num_segmentation_heads,
+            #     self.enable_deep_supervision
+            # )
+            # # Freeze first K encoder stages
+            # K = 3
+            # for stage in self.network.encoder.stages[:K]:
+            #     for p in stage.parameters():
+            #         p.requires_grad = False
+            # self.network.to(self.device)
+
             # compile network for free speedup
             if self._do_i_compile():
                 self.print_to_log_file('Using torch.compile...')
@@ -505,9 +537,19 @@ class nnUNetTrainer(object):
             self.print_to_log_file('These are the global plan.json settings:\n', dct, '\n', add_timestamp=False)
 
     def configure_optimizers(self):
+        #optimizer = torch.optim.AdamW(self.network.parameters(),lr=self.initial_lr,weight_decay=self.weight_decay)
+        #optimizer = torch.optim.AdamW(self.network.parameters(), lr=self.initial_lr, weight_decay=self.weight_decay)
         optimizer = torch.optim.SGD(self.network.parameters(), self.initial_lr, weight_decay=self.weight_decay,
-                                    momentum=0.99, nesterov=True)
+                                 momentum=0.99, nesterov=True)
         lr_scheduler = PolyLRScheduler(optimizer, self.initial_lr, self.num_epochs)
+        #lr_scheduler =  torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer,mode='min',factor=0.1,patience=30,threshold=1e-3)
+        # lr_scheduler = CyclicLR(optimizer,
+        #                         base_lr=1e-1,
+        #                         max_lr=self.initial_lr,  # This should be your 1e-3
+        #                         step_size_up=14,
+        #                         mode='triangular2',
+        #                         cycle_momentum=False)  # Important for AdamW
+
         return optimizer, lr_scheduler
 
     def plot_network_architecture(self):
