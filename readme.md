@@ -108,7 +108,7 @@ This project successfully establishes a formal transfer learning pipeline for me
 
 1.  Clone the repository:
     ```bash
-    git clone [https://github.com/shirkl764/nnUNet_Project.git](https://github.com/Hadgit-tech/nnUNet_BrainTissue_SEG.git)
+    git clone https://github.com/Hadgit-tech/nnUNet_BrainTissue_SEG.git
     cd nnUNet_Project
     ```
 2.  Install the required dependencies and nnU-Net:
