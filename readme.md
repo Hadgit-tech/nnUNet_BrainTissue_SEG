@@ -4,8 +4,6 @@
 
 Hadar Shklarnik , Shir Klinshtern
 
-**Git Repository:** <https://github.com/shirkl764/nnUNet_Project>
-
 ## 1. introduction 
 
 This repository contains a deep learning framework for real-time, multi-class brain tissue segmentation, designed to improve the safety and efficacy of Focused Ultrasound (FUS) neurotherapies.
