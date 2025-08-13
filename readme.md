@@ -61,22 +61,18 @@ The following key hyperparameters were automatically determined by nnU-Net for t
 Ths loss function used is the **Dice loss**, which is particularly effective for imbalanced multi-class segmentation tasks.
 ### 4.4 Loss
 
-We combine **Soft Dice** (optimizes region overlap; handles imbalance) with **Cross-Entropy** (stable gradients). Default: $ \lambda_{\text{Dice}}=\lambda_{\text{CE}}=0.5 $.
+We combine **Soft Dice** (optimizes region overlap; handles imbalance) with **Cross-Entropy** (stable gradients). Default: $\lambda_{\text{Dice}}=\lambda_{\text{CE}}=0.5$.
 
-**Equations** (softmax probs $ \hat y $, one-hot targets $ y $; $ K $ classes; $ N $ pixels):
+**Equations** (softmax probs $ \hat y $, one-hot targets $ y $; $K$ classes; $N$ pixels):
 
 $$
 \mathrm{Dice}_k=\frac{2\sum_i \hat y_{ik}y_{ik}+\epsilon}{\sum_i \hat y_{ik}+\sum_i y_{ik}+\epsilon},\qquad
 \mathcal{L}_{\mathrm{Dice}}=1-\frac{1}{K}\sum_{k=1}^{K}\mathrm{Dice}_k
 $$
 
-$$
-\mathcal{L}_{\mathrm{CE}}=-\frac{1}{N}\sum_{i=1}^{N}\sum_{k=1}^{K} y_{ik}\,\log \hat y_{ik}
-$$
+$$\mathcal{L}_{\mathrm{CE}}=-\frac{1}{N}\sum_{i=1}^{N}\sum_{k=1}^{K} y_{ik}\,\log \hat y_{ik}$$
 
-$$
-\mathcal{L}=\lambda_{\mathrm{Dice}}\,\mathcal{L}_{\mathrm{Dice}}+\lambda_{\mathrm{CE}}\,\mathcal{L}_{\mathrm{CE}}
-$$
+$$\mathcal{L}=\lambda_{\mathrm{Dice}}\,\mathcal{L}_{\mathrm{Dice}}+\lambda_{\mathrm{CE}}\,\mathcal{L}_{\mathrm{CE}}$$
 
 ## 5. Results and Discussion
 
